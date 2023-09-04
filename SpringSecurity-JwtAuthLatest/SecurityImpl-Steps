@@ -1,0 +1,19 @@
+--------------------
+Steps 
+--------------------
+
+1. Develop the entity class
+	1. User- which Implements UserDetails
+	2. Roles
+	3. ManyToMany Relation 
+	
+2. Create a User service which implements UserDetailsService and Override loadUserByUsername()
+
+3. Create the security configuration
+	1. FilterChain bean
+	2. Authentication provider
+	3. PasswordEncoder
+	4. AuthenticationEntryPoint for exception Handling
+	5. Token Filter which implements OncePerRequestFilter
+	6. LogoutHandler class which implements LogoutHadler(I)
+	
