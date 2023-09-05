@@ -1,6 +1,5 @@
 package base.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,23 +11,31 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import base.entity.ERole;
 
 @Configuration
 public class SecurityConfig {
 
-	@Autowired
-	private InvalidUserAuthEntryPoint invalidUserAuthEntryPoint;
+	@Bean
+	public AuthenticationEntryPoint invalidUserAuthEntryPoint() {
+		return new InvalidUserAuthEntryPoint();
+	}
 
-	@Autowired
-	private AuthTokenFilter authTokenFilter;
+	@Bean
+	public OncePerRequestFilter authTokenFilter() {
+		return new AuthTokenFilter();
+	}
 
-	@Autowired
-	private LogoutHandler logoutHandler;
+	@Bean
+	public LogoutHandler logoutHandlerService() {
+		return new LogoutHandlerService();
+	}
 
 	@Bean
 	public PasswordEncoder passwordEncode() {
@@ -50,19 +57,20 @@ public class SecurityConfig {
 			auth.requestMatchers("/", "/auth/*").permitAll();
 			auth.requestMatchers("/user/*").hasAnyAuthority(ERole.SUPER_USER.toString(), ERole.ADMIN.toString(),
 					ERole.USER.toString());
+			auth.requestMatchers("/su/*").hasAuthority(ERole.SUPER_USER.toString());
 			auth.requestMatchers("/admin/*").hasAnyAuthority(ERole.SUPER_USER.toString(), ERole.ADMIN.toString())
 					.anyRequest().authenticated();
 
 		})
 //				.httpBasic(Customizer.withDefaults()) // HTTP BASIC
 
-				.exceptionHandling(exception -> exception.authenticationEntryPoint(invalidUserAuthEntryPoint))
+//				.exceptionHandling(exception -> exception.authenticationEntryPoint(invalidUserAuthEntryPoint()))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
 				// register filter for 2nd request onwards
-				.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class).logout(logout -> {
+				.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class).logout(logout -> {
 					logout.logoutUrl("/api/logout");
-					logout.addLogoutHandler(logoutHandler);
+					logout.addLogoutHandler(logoutHandlerService());
 					logout.logoutSuccessHandler(
 							(request, response, authentication) -> SecurityContextHolder.clearContext());
 				}).build();

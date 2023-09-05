@@ -1,6 +1,5 @@
 package base.utils;
 
-import java.util.Base64;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -49,28 +48,7 @@ public class JwtUtils {
 	}
 
 	private Claims getClaims(String token) {
-		try {
-			return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-		} catch (SignatureException e) {
-			LOGGER.error("Invalid signature!");
-			return null;
-		} catch (MalformedJwtException e) {
-			LOGGER.error("token malformed!");
-			return null;
-		} catch (ExpiredJwtException e) {
-			LOGGER.error("token expired!");
-			e.printStackTrace();
-			return null;
-		} catch (UnsupportedJwtException e) {
-			LOGGER.error("token unsupported!");
-			return null;
-		} catch (IllegalArgumentException e) {
-			LOGGER.error("Claims String is empty!");
-			return null;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
+		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 	}
 
 	public String getUsernameFromToken(String token) {

@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "Roles")
 public class Role implements GrantedAuthority {
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue
