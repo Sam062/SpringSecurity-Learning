@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -25,6 +26,11 @@ public class SecurityConfig {
 	@Bean
 	public AuthenticationEntryPoint invalidUserAuthEntryPoint() {
 		return new InvalidUserAuthEntryPoint();
+	}
+
+	@Bean
+	public AccessDeniedHandler accessDeniedHandler() {
+		return new AccessDeniedHandlerJwt();
 	}
 
 	@Bean
@@ -64,7 +70,11 @@ public class SecurityConfig {
 		})
 //				.httpBasic(Customizer.withDefaults()) // HTTP BASIC
 
-//				.exceptionHandling(exception -> exception.authenticationEntryPoint(invalidUserAuthEntryPoint()))
+				.exceptionHandling(exception -> {
+					exception.authenticationEntryPoint(invalidUserAuthEntryPoint());
+					exception.accessDeniedHandler(accessDeniedHandler());
+				})
+
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
 				// register filter for 2nd request onwards

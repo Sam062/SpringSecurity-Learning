@@ -56,8 +56,8 @@ public class AuthController {
 			authentication = authenticationManager
 					.authenticate(new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+//			e.printStackTrace();
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
 		}
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
